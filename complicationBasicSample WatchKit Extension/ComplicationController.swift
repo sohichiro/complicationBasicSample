@@ -14,7 +14,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     // MARK: - Timeline Configuration
     
     func getSupportedTimeTravelDirectionsForComplication(complication: CLKComplication, withHandler handler: (CLKComplicationTimeTravelDirections) -> Void) {
-        handler([.Forward, .Backward])
+        handler([CLKComplicationTimeTravelDirections.None])
     }
     
     func getTimelineStartDateForComplication(complication: CLKComplication, withHandler handler: (NSDate?) -> Void) {
@@ -33,7 +33,20 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     func getCurrentTimelineEntryForComplication(complication: CLKComplication, withHandler handler: ((CLKComplicationTimelineEntry?) -> Void)) {
         // Call the handler with the current timeline entry
-        handler(nil)
+        if complication.family == .ModularLarge {
+            let modularTemplate = CLKComplicationTemplateModularLargeStandardBody()
+            var rnd = arc4random() % 100
+            modularTemplate.headerTextProvider = CLKSimpleTextProvider(text: "\(rnd)", shortText: "Lg", accessibilityLabel: "Template Text")
+            rnd = arc4random() % 10
+            modularTemplate.body1TextProvider = CLKSimpleTextProvider(text: "\(rnd)", shortText: "B1", accessibilityLabel: "Template Text")
+            rnd = arc4random() % 1000
+            modularTemplate.body2TextProvider = CLKSimpleTextProvider(text: "\(rnd)", shortText: "B2", accessibilityLabel: "Template Text")
+            let timelineEntry = CLKComplicationTimelineEntry(date: NSDate(), complicationTemplate: modularTemplate)
+            handler(timelineEntry)
+        }
+        else {
+            handler(nil)
+        }
     }
     
     func getTimelineEntriesForComplication(complication: CLKComplication, beforeDate date: NSDate, limit: Int, withHandler handler: (([CLKComplicationTimelineEntry]?) -> Void)) {
@@ -57,7 +70,22 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     func getPlaceholderTemplateForComplication(complication: CLKComplication, withHandler handler: (CLKComplicationTemplate?) -> Void) {
         // This method will be called once per supported complication, and the results will be cached
-        handler(nil)
+        switch complication.family {
+        case .ModularLarge:
+            let modularTemplate = CLKComplicationTemplateModularLargeStandardBody()
+            modularTemplate.headerTextProvider = CLKSimpleTextProvider(text: "Large", shortText: "Lg", accessibilityLabel: "TempTextHeader")
+            modularTemplate.body1TextProvider = CLKSimpleTextProvider(text: "Body1", shortText: "B1", accessibilityLabel: "TempTextB1")
+            modularTemplate.body2TextProvider = CLKSimpleTextProvider(text: "Body2", shortText: "B2", accessibilityLabel: "TempTextB2")
+            handler(modularTemplate)
+        case .CircularSmall:
+            handler(nil)
+        case .ModularSmall:
+            handler(nil)
+        case .UtilitarianLarge:
+            handler(nil)
+        case .UtilitarianSmall:
+            handler(nil)
+        }
     }
     
 }

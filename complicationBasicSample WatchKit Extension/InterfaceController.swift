@@ -8,6 +8,7 @@
 
 import WatchKit
 import Foundation
+import ClockKit
 
 
 class InterfaceController: WKInterfaceController {
@@ -28,4 +29,11 @@ class InterfaceController: WKInterfaceController {
         super.didDeactivate()
     }
 
+    @IBAction func pushReflesh() {
+        print(__FUNCTION__)
+        let complicationServer = CLKComplicationServer.sharedInstance()
+        for complication in complicationServer.activeComplications {
+            complicationServer.reloadTimelineForComplication(complication)
+        }
+    }
 }
